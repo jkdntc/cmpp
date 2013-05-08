@@ -29,7 +29,7 @@ public class CmppDecoder implements ProtocolDecoder {
 				byte bytes[] = new byte[in.remaining()];
 				in.get(bytes);
 				headerBuf.put(bytes);
-			} else if (headerBuf.remaining() > 0) {
+			} else if (in.remaining() >= headerBuf.remaining()) {
 				byte bytes[] = new byte[headerBuf.remaining()];
 				in.get(bytes);
 				headerBuf.put(bytes);
@@ -41,14 +41,18 @@ public class CmppDecoder implements ProtocolDecoder {
 				int totalLength = headerBuf.getInt();
 				int commandId = headerBuf.getInt();
 				if (totalLength <= 3511 && totalLength >= Constants.MESSAGE_HEADER_LEN
-						&& getFromCommandId(commandId) != null) {
+						&& isRightCommandId(commandId)) {
 					buf = ByteBuffer.allocate(totalLength);
 					buf.putInt(totalLength);
 					buf.putInt(commandId);
 				} else {
 					String hexdump = String.format("%040x", new BigInteger(headerBuf.array()));
+					headerBuf.rewind();
+					byte tempByte[] = new byte[7];
+					headerBuf.get();//跳过一个字节
+					headerBuf.get(tempByte);
 					headerBuf.clear();
-					headerBuf.putInt(commandId);
+					headerBuf.put(tempByte);
 					ready = false;
 					throw new Exception("totalLength error!" + " ERROR hexdump:" + hexdump);
 				}
@@ -106,6 +110,24 @@ public class CmppDecoder implements ProtocolDecoder {
 			}
 		}
 		return null;
+	}
+
+	public boolean isRightCommandId(int commandId) {
+		switch (commandId) {
+		case Constants.CMPP_CONNECT:
+		case Constants.CMPP_CONNECT_RESP:
+		case Constants.CMPP_DELIVER:
+		case Constants.CMPP_DELIVER_RESP:
+		case Constants.CMPP_SUBMIT:
+		case Constants.CMPP_SUBMIT_RESP:
+		case Constants.CMPP_ACTIVE_TEST_RESP:
+		case Constants.CMPP_ACTIVE_TEST:
+		case Constants.CMPP_TERMINATE:
+		case Constants.CMPP_TERMINATE_RESP:
+			return true;
+		default:
+			return false;
+		}
 	}
 
 	public CmppMessageHeader getFromCommandId(int commandId) {

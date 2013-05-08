@@ -46,15 +46,12 @@ public class CmppDecoder implements ProtocolDecoder {
 					buf.putInt(totalLength);
 					buf.putInt(commandId);
 				} else {
-					String hexdump = String.format("%040x", new BigInteger(headerBuf.array()));
-					headerBuf.rewind();
-					byte tempByte[] = new byte[7];
-					headerBuf.get();//跳过一个字节
-					headerBuf.get(tempByte);
+					String hexdump = String.format("%040x", new BigInteger(headerBuf.array()))
+							+ String.format("%040x", new BigInteger(in.array()));
 					headerBuf.clear();
-					headerBuf.put(tempByte);
 					ready = false;
-					throw new Exception("totalLength error!" + " ERROR hexdump:" + hexdump);
+					session.close(true);
+					throw new Exception("包头错误：" + hexdump);
 				}
 			} else if (in.remaining() >= buf.remaining()) {
 				byte bytes[] = new byte[buf.remaining()];
@@ -65,12 +62,14 @@ public class CmppDecoder implements ProtocolDecoder {
 				if (message != null) {
 					out.write(message);
 				} else {
+					String hexdump = String.format("%040x", new BigInteger(buf.array()))
+							+ String.format("%040x", new BigInteger(in.array()));
 					buf.clear();
 					buf = null;
 					headerBuf.clear();
 					ready = false;
-					throw new Exception("message decode error!" + " ERROR hexdump:"
-							+ String.format("%040x", new BigInteger(buf.array())));
+					session.close(true);
+					throw new Exception("数据包错误：" + hexdump);
 				}
 				buf.clear();
 				buf = null;

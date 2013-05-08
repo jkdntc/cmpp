@@ -129,16 +129,12 @@ public class CmppHandler implements IoHandler {
 	@Override
 	public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
 		if (client) {
-			if (noResp) {
+			if (noResp || !login || submitTable.size() > 0) {
 				session.close(true);
 			} else {
-				if (submitTable.size() > 0) { // Idel后，有下行没返回应答
-					session.close(true);
-				} else {
-					noResp = true;
-					CmppActiveTest cat = new CmppActiveTest();
-					session.write(cat);
-				}
+				noResp = true;
+				CmppActiveTest cat = new CmppActiveTest();
+				session.write(cat);
 			}
 		} else {
 			session.close(true);

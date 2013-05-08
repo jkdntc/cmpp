@@ -13,13 +13,12 @@ public class CmppTestClient {
 			SQLException, InterruptedException {
 		CmppClient client = new CmppClient("cmpp.properties");
 
-		client.addListener(new CmppLogToDbListener("jdbc.properties"));
+		client.addListener(new CmppLogToDbListener("cmpp.properties"));
 
 		client.start();
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			while (!client.ready())
 				;
-
 			CmppSubmit submit = new CmppSubmit(Constants.CMPP2_VERSION, "serviceId", "1311111111",
 					"C00014", "01", "0", "50", "1311111111", "第一次", "linkid");
 
@@ -28,7 +27,7 @@ public class CmppTestClient {
 		client.stop();
 
 		client.start();
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			while (!client.ready())
 				;
 

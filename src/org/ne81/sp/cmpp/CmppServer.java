@@ -36,7 +36,7 @@ public class CmppServer implements Runnable {
 					new ProtocolCodecFilter(new CmppCodecFactory()));
 			acceptor.getFilterChain().addLast("logger", new LoggingFilter());
 			acceptor.setHandler(new CmppHandler(false));
-			acceptor.getSessionConfig().setReadBufferSize(2048);
+			acceptor.getSessionConfig().setReadBufferSize(4000);
 			acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 3 * 60 * 1000);
 			InetSocketAddress isa = new InetSocketAddress(port);
 			acceptor.bind(isa);

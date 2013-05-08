@@ -73,7 +73,7 @@ public class CmppClient implements Runnable, CmppListener {
 	public void stop() {
 		thisThread = null;
 		// wait until the summation is done
-		session.getCloseFuture().awaitUninterruptibly(11 * 1000);
+		session.getCloseFuture().awaitUninterruptibly(10 * 1000);
 		session.close(false);
 		connector.dispose();
 	}
@@ -81,23 +81,26 @@ public class CmppClient implements Runnable, CmppListener {
 	public void run() {
 		logger.info("Start ISMGServer=" + ismgServerIp + ":" + ismgServerPort + "\t SPNumber="
 				+ spNumber);
-		connector = new NioSocketConnector();
-		connector.setConnectTimeoutMillis(10 * 1000);
-
-		connector.getFilterChain().addLast("codec",
-				new ProtocolCodecFilter(new CmppCodecFactory(version)));
-		connector.getFilterChain().addLast("logger", new LoggingFilter());
-		connector.setHandler(handler);
-		connector.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, Constants.C / 1000);
 
 		while (thisThread == Thread.currentThread()) {
 			if (session == null || !session.isConnected()) {
 				try {
+					if (connector != null)
+						connector.dispose();
+					connector = new NioSocketConnector();
+					connector.setConnectTimeoutMillis(10 * 1000);
+
+					connector.getFilterChain().addLast("codec",
+							new ProtocolCodecFilter(new CmppCodecFactory(version)));
+					connector.getFilterChain().addLast("logger", new LoggingFilter());
+					connector.setHandler(handler);
+					connector.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE,
+							Constants.C / 1000);
 					ConnectFuture future = connector.connect(new InetSocketAddress(ismgServerIp,
 							ismgServerPort), new InetSocketAddress(spClientBindIp, 0));
-
 					future.awaitUninterruptibly();
 					session = future.getSession();
+					session.getConfig().setReadBufferSize(4000);
 					CmppConnect cc = new CmppConnect();
 					SimpleDateFormat formatter = new SimpleDateFormat("MMddHHmmss");
 					String time = formatter.format(new Date());

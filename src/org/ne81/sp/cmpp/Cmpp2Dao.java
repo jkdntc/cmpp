@@ -16,7 +16,7 @@ public class Cmpp2Dao {
 	private SqlPool sqlPool;
 
 	public Cmpp2Dao(String dbconfig) throws ClassNotFoundException, SQLException, IOException {
-		sqlPool = new SqlPool(dbconfig);
+		sqlPool = new SqlPool(dbconfig, "cmpp_log/sqlpool.log");
 	}
 
 	public void close() throws IOException {
@@ -69,7 +69,9 @@ public class Cmpp2Dao {
 				pstmt.setString(i * colums + j++, message.getLinkId());
 				pstmt.setInt(i * colums + j++, message.getResult());
 			}
-			pstmt.addBatch();
+			sql_error = pstmt.toString();
+			count = pstmt.executeUpdate();
+			pstmt.close();
 			sql = "INSERT INTO `cmpp_submit_destid`(`submitid`, `destTerminalId`)VALUES";
 			for (int i = 0; i < messages.size(); i++) {
 				String destTerminalIds[] = messages.get(i).getDestTerminalId();
@@ -78,11 +80,9 @@ public class Cmpp2Dao {
 				}
 			}
 			sql = sql.substring(0, sql.length() - 1);
-			pstmt.addBatch(sql);
-			// sql_error += ";" + sql;
+			pstmt = conn.prepareStatement(sql);
 			sql_error = pstmt.toString();
-			int counts[] = pstmt.executeBatch();
-			count = counts[1];
+			count = pstmt.executeUpdate();
 			pstmt.close();
 		} catch (SQLException e) {
 			sqlPool.saveSql(e.getMessage(), sql_error);

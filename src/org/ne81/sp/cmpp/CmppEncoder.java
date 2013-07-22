@@ -18,6 +18,8 @@ public class CmppEncoder implements ProtocolEncoder {
 	public void encode(IoSession session, Object message, ProtocolEncoderOutput out)
 			throws Exception {
 		ByteBuffer buf = ((CmppMessageHeader) message).toBuffer();
+		if (buf == null)
+			throw new Exception("toBuffer false Message=" + message.toString());
 		IoBuffer ibuf = IoBuffer.wrap(buf);
 		out.write(ibuf);
 	}

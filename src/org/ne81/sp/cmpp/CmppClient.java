@@ -126,7 +126,7 @@ public class CmppClient implements Runnable, CmppListener {
 				}
 			} else {
 				try {
-					Thread.sleep(1);
+					Thread.sleep(10 * 1000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -141,8 +141,7 @@ public class CmppClient implements Runnable, CmppListener {
 
 	synchronized public void send(CmppSubmit submit) {
 		submit.setMsgSrc(spId);
-		handler.setW(handler.getW() + 1);
-		handler.getSubmitTable().put(submit.getSequenceId(), submit);
+		handler.addSubmitToTable(submit);
 		session.write(submit);
 	}
 
@@ -167,4 +166,9 @@ public class CmppClient implements Runnable, CmppListener {
 		for (CmppListener listener : this.listener)
 			listener.reportReceived(this, report);
 	}
+
+	public String getSpNumber() {
+		return spNumber;
+	}
+
 }

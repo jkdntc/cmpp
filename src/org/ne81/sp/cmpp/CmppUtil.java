@@ -115,6 +115,15 @@ public class CmppUtil {
 
 	public static CmppSubmit[] getConcatenatedSms(CmppSubmit submit, String shortMessage) {
 		if (shortMessage.length() <= 70) {
+			try {
+				if (submit.getMsgFmt() == (byte) 8)
+					submit.setMsgContent(shortMessage.getBytes("utf-16"));
+
+				else
+					submit.setMsgContent(shortMessage.getBytes("gbk"));
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();// 应该不会报错
+			}
 			submit.setMsgContent(shortMessage.getBytes());
 			return new CmppSubmit[] { submit };
 		}
@@ -127,7 +136,18 @@ public class CmppUtil {
 		// message text will change each time
 		CmppSubmit submits[] = new CmppSubmit[totalSegments];
 		for (int i = 0; i < totalSegments; i++) {
-			ByteBuffer ed = ByteBuffer.allocate(7 + splittedMsg[i].getBytes().length);
+			byte[] msg = null;
+			try {
+				if (submit.getMsgFmt() == (byte) 8)
+					msg = splittedMsg[i].getBytes("utf-16");
+				else
+					msg = splittedMsg[i].getBytes("gbk");
+			} catch (UnsupportedEncodingException e1) {
+				// 不会出问题
+				e1.printStackTrace();
+			}
+
+			ByteBuffer ed = ByteBuffer.allocate(7 + msg.length);
 
 			ed.put((byte) 6); // UDH Length
 
@@ -143,17 +163,7 @@ public class CmppUtil {
 
 			// This encoding comes in Logica Open SMPP. Refer to its docs for
 			// more detail
-			try {
-				if (submit.getMsgFmt() == (byte) 8)
-					ed.put(splittedMsg[i].getBytes("utf-16"));
-
-				else
-					ed.put(splittedMsg[i].getBytes("gbk"));
-			} catch (UnsupportedEncodingException e1) {
-				// 不会出问题
-				e1.printStackTrace();
-			}
-
+			ed.put(msg);
 			try {
 				submits[i] = submit.clone();
 			} catch (CloneNotSupportedException e) {

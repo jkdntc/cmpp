@@ -48,17 +48,17 @@ public class CmppSubmit extends CmppMessageHeader implements java.lang.Cloneable
 
 	byte destUsrTl = 1;
 
-	String[] destTerminalId = new String[1];// 21
+	String[] destTerminalId;// 21
 
 	byte destTerminalType = 0;
 
 	byte msgLength; // 1
 
-	byte[] msgContent = new byte[1];
+	byte[] msgContent;
 
 	String linkId = "";// 20
 
-	int result;
+	int result = -1;// 默认无应答
 	private int terminalIdLen;
 	private int linkIdLen;
 	private int submitExpMsgLen;
@@ -66,7 +66,7 @@ public class CmppSubmit extends CmppMessageHeader implements java.lang.Cloneable
 	public String toString() {
 		String msgContent = CmppUtil.getMessageContent(this.msgContent, msgFmt);
 		String destTerminalId = "";
-		for (int i = 0; i < this.destTerminalId.length; i++) {
+		for (int i = 0; this.destTerminalId != null && i < this.destTerminalId.length; i++) {
 			destTerminalId += this.destTerminalId[i] + ",";
 		}
 
@@ -369,8 +369,9 @@ public class CmppSubmit extends CmppMessageHeader implements java.lang.Cloneable
 
 	public void setDestTerminalId(String[] destTerminalId) {
 		this.destTerminalId = destTerminalId;
-		this.totalLength = Constants.MESSAGE_HEADER_LEN + submitExpMsgLen + msgContent.length
-				+ destTerminalId.length * terminalIdLen;
+		destUsrTl = (byte) destTerminalId.length;
+		this.totalLength = Constants.MESSAGE_HEADER_LEN + submitExpMsgLen + (msgLength & 0xFF) + destUsrTl
+				* terminalIdLen;
 	}
 
 	public byte getMsgLength() {
@@ -387,9 +388,9 @@ public class CmppSubmit extends CmppMessageHeader implements java.lang.Cloneable
 
 	public void setMsgContent(byte[] msgContent) {
 		this.msgContent = msgContent;
-		this.totalLength = Constants.MESSAGE_HEADER_LEN + submitExpMsgLen + msgContent.length
-				+ destTerminalId.length * terminalIdLen;
-		this.msgLength = (byte) msgContent.length;
+		msgLength = (byte) msgContent.length;
+		this.totalLength = Constants.MESSAGE_HEADER_LEN + submitExpMsgLen + (msgLength & 0xFF) + destUsrTl
+				* terminalIdLen;
 	}
 
 	public byte getFeeTerminalType() {

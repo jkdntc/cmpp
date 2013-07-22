@@ -15,14 +15,14 @@ public class CmppHandler implements IoHandler {
 	private boolean login;
 	private int w;
 	private boolean noResp = false;
-	private Hashtable<Integer, CmppMessageHeader> submitTable;
+	private Hashtable<Integer, CmppSubmit> submitTable;
 	private CmppListener listener;
 	private long reportMsgId;
 	private byte version = 32;
 
 	public CmppHandler(boolean client) {
 		this.client = client;
-		submitTable = new Hashtable<Integer, CmppMessageHeader>();
+		submitTable = new Hashtable<Integer, CmppSubmit>();
 	}
 
 	@Override
@@ -36,11 +36,6 @@ public class CmppHandler implements IoHandler {
 		if (client) {
 			if (message instanceof CmppConnectResp) {
 				if (((CmppConnectResp) message).getStatus() == 0) {
-					for (Entry<Integer, CmppMessageHeader> entry : submitTable.entrySet()) {
-						CmppMessageHeader submit = entry.getValue();
-						session.write(submit);
-						w++;
-					}
 					login = true;
 					version = ((CmppConnectResp) message).getVersion();
 				}
@@ -167,12 +162,24 @@ public class CmppHandler implements IoHandler {
 
 	@Override
 	public void sessionClosed(IoSession session) throws Exception {
+		synchronized (submitTable) {
+			// System.out.println("submitTable size=" + submitTable.size());
+			for (Entry<Integer, CmppSubmit> entry : submitTable.entrySet()) {
+				CmppSubmit submit = entry.getValue();
+				// System.out.println("no resp submit=" + submit.toString());
+				submit.setResult(-1);
+				if (listener != null)
+					listener.submitSent(null, submit);
+			}
+			submitTable.clear();
+			// System.out.println("submitTable size=" + submitTable.size());
+		}
 	}
 
 	@Override
 	public void sessionCreated(IoSession session) throws Exception {
 		setLogin(false);
-		setW(0);
+		w = 0;
 		noResp = false;
 	}
 
@@ -193,12 +200,11 @@ public class CmppHandler implements IoHandler {
 		return w;
 	}
 
-	public void setW(int w) {
-		this.w = w;
-	}
-
-	public Hashtable<Integer, CmppMessageHeader> getSubmitTable() {
-		return submitTable;
+	public void addSubmitToTable(CmppSubmit submit) {
+		w++;
+		synchronized (submitTable) {
+			submitTable.put(submit.getSequenceId(), submit);
+		}
 	}
 
 	public CmppListener getListener() {

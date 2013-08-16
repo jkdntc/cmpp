@@ -35,67 +35,69 @@ public class Cmpp2Dao {
 		sql = sql.substring(0, sql.length() - 1);
 		int count = 0;
 		Connection conn = null;
-		try {
-			conn = sqlPool.getConnection();
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			for (int i = 0; i < messages.size(); i++) {
-				CmppSubmit message = messages.get(i);
-				int j = 1;
-				pstmt.setString(i * colums + j++, message.getId());
-				pstmt.setTimestamp(i * colums + j++, new Timestamp(message.getDt().getTime()));
-				pstmt.setLong(i * colums + j++, message.getMsgId());
-				pstmt.setByte(i * colums + j++, message.getPkTotal());
-				pstmt.setByte(i * colums + j++, message.getPkNumber());
-				pstmt.setByte(i * colums + j++, message.getRegisteredDelivery());
-				pstmt.setByte(i * colums + j++, message.getMsgLevel());
-				pstmt.setString(i * colums + j++, message.getServiceId());
-				pstmt.setByte(i * colums + j++, message.getFeeUserType());
-				pstmt.setString(i * colums + j++, message.getFeeTerminalId());
-				pstmt.setByte(i * colums + j++, message.getFeeTerminalType());
-				pstmt.setByte(i * colums + j++, message.getTp_pid());
-				pstmt.setByte(i * colums + j++, message.getTp_udhi());
-				pstmt.setByte(i * colums + j++, message.getMsgFmt());
-				pstmt.setString(i * colums + j++, message.getMsgSrc());
-				pstmt.setString(i * colums + j++, message.getFeeType());
-				pstmt.setString(i * colums + j++, message.getFeeCode());
-				pstmt.setString(i * colums + j++, message.getVaildTime());
-				pstmt.setString(i * colums + j++, message.getAtTime());
-				pstmt.setString(i * colums + j++, message.getSrcId());
-				pstmt.setByte(i * colums + j++, message.getDestUsrTl());
-				pstmt.setByte(i * colums + j++, message.getDestTerminalType());
-				pstmt.setInt(i * colums + j++, message.getMsgLength() & 0xFF);
-				pstmt.setString(i * colums + j++,
-						CmppUtil.getMessageContent(message.getMsgContent(), message.getMsgFmt()));
-				pstmt.setString(i * colums + j++, message.getLinkId());
-				pstmt.setInt(i * colums + j++, message.getResult());
-			}
-			sql_error = pstmt.toString();
-			count = pstmt.executeUpdate();
-			pstmt.close();
-			sql = "INSERT INTO `cmpp_submit_destid`(`submitid`, `destTerminalId`)VALUES";
-			for (int i = 0; i < messages.size(); i++) {
-				String destTerminalIds[] = messages.get(i).getDestTerminalId();
-				for (int j = 0; j < destTerminalIds.length; j++) {
-					sql += "('" + messages.get(i).getId() + "','" + destTerminalIds[j] + "'),";
+		for (int times = 0; times < 3; times++)
+			try {
+				conn = sqlPool.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+				for (int i = 0; i < messages.size(); i++) {
+					CmppSubmit message = messages.get(i);
+					int j = 1;
+					pstmt.setString(i * colums + j++, message.getId());
+					pstmt.setTimestamp(i * colums + j++, new Timestamp(message.getDt().getTime()));
+					pstmt.setLong(i * colums + j++, message.getMsgId());
+					pstmt.setByte(i * colums + j++, message.getPkTotal());
+					pstmt.setByte(i * colums + j++, message.getPkNumber());
+					pstmt.setByte(i * colums + j++, message.getRegisteredDelivery());
+					pstmt.setByte(i * colums + j++, message.getMsgLevel());
+					pstmt.setString(i * colums + j++, message.getServiceId());
+					pstmt.setByte(i * colums + j++, message.getFeeUserType());
+					pstmt.setString(i * colums + j++, message.getFeeTerminalId());
+					pstmt.setByte(i * colums + j++, message.getFeeTerminalType());
+					pstmt.setByte(i * colums + j++, message.getTp_pid());
+					pstmt.setByte(i * colums + j++, message.getTp_udhi());
+					pstmt.setByte(i * colums + j++, message.getMsgFmt());
+					pstmt.setString(i * colums + j++, message.getMsgSrc());
+					pstmt.setString(i * colums + j++, message.getFeeType());
+					pstmt.setString(i * colums + j++, message.getFeeCode());
+					pstmt.setString(i * colums + j++, message.getVaildTime());
+					pstmt.setString(i * colums + j++, message.getAtTime());
+					pstmt.setString(i * colums + j++, message.getSrcId());
+					pstmt.setByte(i * colums + j++, message.getDestUsrTl());
+					pstmt.setByte(i * colums + j++, message.getDestTerminalType());
+					pstmt.setInt(i * colums + j++, message.getMsgLength() & 0xFF);
+					pstmt.setString(i * colums + j++, CmppUtil.getMessageContent(
+							message.getMsgContent(), message.getMsgFmt()));
+					pstmt.setString(i * colums + j++, message.getLinkId());
+					pstmt.setInt(i * colums + j++, message.getResult());
 				}
-			}
-			sql = sql.substring(0, sql.length() - 1);
-			pstmt = conn.prepareStatement(sql);
-			sql_error = pstmt.toString();
-			count = pstmt.executeUpdate();
-			pstmt.close();
-		} catch (SQLException e) {
-			sqlPool.saveSql(e.getMessage(), sql_error);
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				try {
-					conn.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				sql_error = pstmt.toString();
+				count = pstmt.executeUpdate();
+				pstmt.close();
+				sql = "INSERT INTO `cmpp_submit_destid`(`submitid`, `destTerminalId`)VALUES";
+				for (int i = 0; i < messages.size(); i++) {
+					String destTerminalIds[] = messages.get(i).getDestTerminalId();
+					for (int j = 0; j < destTerminalIds.length; j++) {
+						sql += "('" + messages.get(i).getId() + "','" + destTerminalIds[j] + "'),";
+					}
 				}
+				sql = sql.substring(0, sql.length() - 1);
+				pstmt = conn.prepareStatement(sql);
+				sql_error = pstmt.toString();
+				count = pstmt.executeUpdate();
+				pstmt.close();
+				break;
+			} catch (SQLException e) {
+				sqlPool.saveSql(e.getMessage(), sql_error);
+				e.printStackTrace();
+			} finally {
+				if (conn != null)
+					try {
+						conn.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
 
-		}
+			}
 		return count;
 	}
 
@@ -108,43 +110,45 @@ public class Cmpp2Dao {
 		sql = sql.substring(0, sql.length() - 1);
 		int count = 0;
 		Connection conn = null;
-		try {
-			conn = sqlPool.getConnection();
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			for (int i = 0; i < messages.size(); i++) {
-				CmppDeliver message = messages.get(i);
-				int j = 1;
-				pstmt.setString(i * colums + j++, message.getId());
-				pstmt.setTimestamp(i * colums + j++, new Timestamp(message.getDt().getTime()));
-				pstmt.setLong(i * colums + j++, message.getMsgId());
-				pstmt.setString(i * colums + j++, message.getDestId());
-				pstmt.setString(i * colums + j++, message.getServiceId());
-				pstmt.setByte(i * colums + j++, message.getTp_pid());
-				pstmt.setByte(i * colums + j++, message.getTp_udhi());
-				pstmt.setByte(i * colums + j++, message.getMsgFmt());
-				pstmt.setString(i * colums + j++, message.getSrcTerminalId());
-				pstmt.setByte(i * colums + j++, message.getSrcTerminalType());
-				pstmt.setByte(i * colums + j++, message.getRegisteredDelivery());
-				pstmt.setInt(i * colums + j++, message.getMsgLength() & 0xFF);
-				pstmt.setString(i * colums + j++,
-						CmppUtil.getMessageContent(message.getMsgContent(), message.getMsgFmt()));
-				pstmt.setString(i * colums + j++, message.getLinkId());
-			}
-			sql = pstmt.toString();
-			count = pstmt.executeUpdate();
-			pstmt.close();
-		} catch (SQLException e) {
-			sqlPool.saveSql(e.getMessage(), sql);
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				try {
-					conn.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+		for (int times = 0; times < 3; times++)
+			try {
+				conn = sqlPool.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+				for (int i = 0; i < messages.size(); i++) {
+					CmppDeliver message = messages.get(i);
+					int j = 1;
+					pstmt.setString(i * colums + j++, message.getId());
+					pstmt.setTimestamp(i * colums + j++, new Timestamp(message.getDt().getTime()));
+					pstmt.setLong(i * colums + j++, message.getMsgId());
+					pstmt.setString(i * colums + j++, message.getDestId());
+					pstmt.setString(i * colums + j++, message.getServiceId());
+					pstmt.setByte(i * colums + j++, message.getTp_pid());
+					pstmt.setByte(i * colums + j++, message.getTp_udhi());
+					pstmt.setByte(i * colums + j++, message.getMsgFmt());
+					pstmt.setString(i * colums + j++, message.getSrcTerminalId());
+					pstmt.setByte(i * colums + j++, message.getSrcTerminalType());
+					pstmt.setByte(i * colums + j++, message.getRegisteredDelivery());
+					pstmt.setInt(i * colums + j++, message.getMsgLength() & 0xFF);
+					pstmt.setString(i * colums + j++, CmppUtil.getMessageContent(
+							message.getMsgContent(), message.getMsgFmt()));
+					pstmt.setString(i * colums + j++, message.getLinkId());
 				}
+				sql = pstmt.toString();
+				count = pstmt.executeUpdate();
+				pstmt.close();
+				break;
+			} catch (SQLException e) {
+				sqlPool.saveSql(e.getMessage(), sql);
+				e.printStackTrace();
+			} finally {
+				if (conn != null)
+					try {
+						conn.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
 
-		}
+			}
 		return count;
 	}
 
@@ -157,36 +161,38 @@ public class Cmpp2Dao {
 		sql = sql.substring(0, sql.length() - 1);
 		int count = 0;
 		Connection conn = null;
-		try {
-			conn = sqlPool.getConnection();
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			for (int i = 0; i < messages.size(); i++) {
-				CmppReport message = messages.get(i);
-				int j = 1;
-				pstmt.setString(i * colums + j++, message.getId());
-				pstmt.setTimestamp(i * colums + j++, new Timestamp(message.getDt().getTime()));
-				pstmt.setLong(i * colums + j++, message.getMsgId());
-				pstmt.setString(i * colums + j++, message.getStat());
-				pstmt.setString(i * colums + j++, message.getSubmitTime());
-				pstmt.setString(i * colums + j++, message.getDoneTime());
-				pstmt.setString(i * colums + j++, message.getDestTerminalId());
-				pstmt.setInt(i * colums + j++, message.getSmscSequence());
-			}
-			sql = pstmt.toString();
-			count = pstmt.executeUpdate();
-			pstmt.close();
-		} catch (SQLException e) {
-			sqlPool.saveSql(e.getMessage(), sql);
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				try {
-					conn.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+		for (int times = 0; times < 3; times++)
+			try {
+				conn = sqlPool.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+				for (int i = 0; i < messages.size(); i++) {
+					CmppReport message = messages.get(i);
+					int j = 1;
+					pstmt.setString(i * colums + j++, message.getId());
+					pstmt.setTimestamp(i * colums + j++, new Timestamp(message.getDt().getTime()));
+					pstmt.setLong(i * colums + j++, message.getMsgId());
+					pstmt.setString(i * colums + j++, message.getStat());
+					pstmt.setString(i * colums + j++, message.getSubmitTime());
+					pstmt.setString(i * colums + j++, message.getDoneTime());
+					pstmt.setString(i * colums + j++, message.getDestTerminalId());
+					pstmt.setInt(i * colums + j++, message.getSmscSequence());
 				}
+				sql = pstmt.toString();
+				count = pstmt.executeUpdate();
+				pstmt.close();
+				break;
+			} catch (SQLException e) {
+				sqlPool.saveSql(e.getMessage(), sql);
+				e.printStackTrace();
+			} finally {
+				if (conn != null)
+					try {
+						conn.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
 
-		}
+			}
 		return count;
 	}
 

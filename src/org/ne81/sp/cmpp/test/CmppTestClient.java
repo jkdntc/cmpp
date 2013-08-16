@@ -6,37 +6,36 @@ import java.sql.SQLException;
 import org.ne81.sp.cmpp.CmppClient;
 import org.ne81.sp.cmpp.CmppLogToDbListener;
 import org.ne81.sp.cmpp.CmppSubmit;
+import org.ne81.sp.cmpp.CmppUtil;
 import org.ne81.sp.cmpp.Constants;
 
 public class CmppTestClient {
 	public static void main(String args[]) throws IOException, ClassNotFoundException,
 			SQLException, InterruptedException {
-		CmppClient client = new CmppClient("cmpp.properties");
+		final CmppClient client = new CmppClient("cmpp.properties");
 
 		client.addListener(new CmppLogToDbListener("cmpp.properties"));
 
 		client.start();
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < 1; i++) {
 			while (!client.ready())
 				;
 			CmppSubmit submit = new CmppSubmit(Constants.CMPP2_VERSION, "serviceId", "1311111111",
-					"C00014", "01", "0", "50", "1311111111", "第一次", "linkid");
-
-			client.send(submit);
+					"01", "0", "50", "1311111111", "中文안녕하세요", "linkid");
+			submit.setMsgId(submit.getSequenceId());
+			// submit.setMsgFmt((byte) 8);
+			CmppSubmit submits[] = CmppUtil
+					.getConcatenatedSms(
+							submit,
+							"你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好");
+			for (int j = 0; j < submits.length; j++)
+				client.send(submits[j]);
 		}
-		client.stop();
-
-		client.start();
-		for (int i = 0; i < 1000; i++) {
-			while (!client.ready())
-				;
-
-			CmppSubmit submit = new CmppSubmit(Constants.CMPP2_VERSION, "serviceId", "1311111111",
-					"C00014", "01", "0", "50", "1311111111", "二次发送", "linkid");
-
-			client.send(submit);
-		}
-		client.stop();
+		java.lang.Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				client.stop();
+			}
+		});
 
 	}
 }

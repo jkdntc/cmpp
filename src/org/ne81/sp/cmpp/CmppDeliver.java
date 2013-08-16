@@ -94,8 +94,6 @@ public class CmppDeliver extends CmppMessageHeader {
 		msgLength = buf.get();
 
 		if (registeredDelivery == 0) {
-			if ((msgLength & 0xFF) == 0)
-				return false;
 			msgContent = new byte[msgLength & 0xFF];
 			buf.get(msgContent);
 		} else {

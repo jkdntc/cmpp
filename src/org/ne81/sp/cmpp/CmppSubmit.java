@@ -93,7 +93,7 @@ public class CmppSubmit extends CmppMessageHeader implements java.lang.Cloneable
 		}
 	}
 
-	public CmppSubmit(byte version, String serviceId, String feeTerminalId, String msgSrc,
+	public CmppSubmit(byte version, String serviceId, String feeTerminalId,
 			String feeType, String feeCode, String srcId, String destTerminalId, String msgContent,
 			String linkId) {
 		super(Constants.CMPP_SUBMIT, version);
@@ -109,7 +109,6 @@ public class CmppSubmit extends CmppMessageHeader implements java.lang.Cloneable
 		// msgLength = (byte) msgContent.getBytes().length;
 		this.serviceId = serviceId;
 		this.feeTerminalId = feeTerminalId;
-		this.msgSrc = msgSrc;
 		this.feeType = feeType;
 		this.feeCode = feeCode;
 		this.srcId = srcId;

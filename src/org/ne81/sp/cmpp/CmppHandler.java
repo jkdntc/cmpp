@@ -78,11 +78,11 @@ public class CmppHandler implements IoHandler {
 
 				// for test
 				// for (int i = 0; i < 100; i++) {
-				// CmppDeliver deliver = new CmppDeliver(version, ++reportMsgId,
-				// "10658167303",
-				// "serviceid", "13651398480", new String("4").getBytes(),
-				// "linkId");
-				// session.write(deliver);
+				 CmppDeliver deliver = new CmppDeliver(version, ++reportMsgId,
+				 "10658167303",
+				 "serviceid", "13651398480", new byte[]{},
+				 "linkId");
+				 session.write(deliver);
 				// }
 			} else if (message instanceof CmppDeliverResp) {
 

@@ -1,10 +1,12 @@
 package org.ne81.sp.cmpp;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MessageDecoder {
 	public static CmppSubmit submitDecode(String str) throws Exception {
-		String field[] = str.split("\t");
+		String field[] = loadConvert(str);
 		if (field.length < 27)
 			throw new Exception("submit 列数不够 <27 message=" + str);
 		int i = 0;
@@ -53,9 +55,9 @@ public class MessageDecoder {
 	 * @throws Exception
 	 */
 	public static CmppDeliver deliverDecode(String str) throws Exception {
-		String field[] = str.split("\t");
+		String field[] = loadConvert(str);
 		if (field.length < 14)
-			throw new Exception("deliver 列数不够 <14");
+			throw new Exception("deliver 列数不够 <13");
 		int i = 0;
 		CmppDeliver deliver = new CmppDeliver(Constants.CMPP3_VERSION);
 		deliver.setId(field[i++]);
@@ -85,7 +87,7 @@ public class MessageDecoder {
 	 * @throws Exception
 	 */
 	public static CmppReport reportDecode(String str) throws Exception {
-		String field[] = str.split("\t");
+		String field[] = loadConvert(str);
 		if (field.length < 8)
 			throw new Exception("report 列数不够 <8");
 		int i = 0;
@@ -99,5 +101,25 @@ public class MessageDecoder {
 		report.setDestTerminalId(field[i++]);
 		report.setSmscSequence(Integer.parseInt(field[i++]));
 		return report;
+	}
+
+	public static String[] loadConvert(String inStr) {
+		List<String> list = new ArrayList<String>();
+		int end = inStr.length();
+		int off = 0;
+		char[] in = inStr.toCharArray();
+		char aChar;
+		int start = 0;
+		while (off < end) {
+			aChar = in[off++];
+			if (aChar == '\t') {
+				list.add(new String(in, start, off - start - 1));
+				start = off;
+			}
+		}
+		list.add(new String(in, start, end - start));
+		String[] out = new String[list.size()];
+		out = list.toArray(out);
+		return out;
 	}
 }

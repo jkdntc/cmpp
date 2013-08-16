@@ -61,6 +61,8 @@ public class CmppClient implements Runnable, CmppListener {
 	}
 
 	private void init() {
+		if(spNumber==null)
+			spNumber="";
 		handler = new CmppHandler(true);
 		handler.setListener(this);
 	}

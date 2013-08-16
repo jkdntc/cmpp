@@ -32,6 +32,20 @@ public class CmppLogToDbListener implements CmppListener {
 				"cmpp_log/cmpp_report.log", 100000000, false, 1000);
 	}
 
+	public CmppLogToDbListener(String dbconfig, String logDir) throws ClassNotFoundException,
+			SQLException, IOException {
+		dao = new Cmpp2Dao(dbconfig);
+
+		submitExecutor = new Executor(new MyExecutorListener(Constants.CMPP_SUBMIT), logDir
+				+ "/cmpp_submit.log", 100000000, false, 1000);
+
+		deliverExecutor = new Executor(new MyExecutorListener(Constants.CMPP_DELIVER), logDir
+				+ "/cmpp_deliver.log", 100000000, false, 1000);
+
+		reportExecutor = new Executor(new MyExecutorListener(Constants.CMPP_REPORT_LEN), logDir
+				+ "/cmpp_report.log", 100000000, false, 1000);
+	}
+
 	@Override
 	public void submitSent(CmppClient client, CmppSubmit submit) {
 		if (submit.getId() == null)

@@ -1,0 +1,4 @@
+dependencies {
+	compile project(':ne81commons')
+	compile('org.apache.mina:mina-core:2.0.7')
+}

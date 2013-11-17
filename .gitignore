@@ -2,3 +2,7 @@
 /bin
 /cmpp_log
 /log4j.log
+/build
+/.settings
+/.project
+/.classpath

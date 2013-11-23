@@ -1,4 +1,20 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+   mavenCentral()
+}
+
 dependencies {
-	compile project(':ne81commons')
+    compile('org.slf4j:slf4j-api:1.7.5')
+    compile project(':ne81commons')
 	compile('org.apache.mina:mina-core:2.0.7')
 }
+
+version = '1.0'
+
+jar {
+    manifest.attributes provider: 'www.ne81.com'
+}
+compileJava.options.encoding = 'UTF-8'
+

@@ -80,7 +80,7 @@ public class CmppHandler implements IoHandler {
 				// for (int i = 0; i < 100; i++) {
 				 CmppDeliver deliver = new CmppDeliver(version, ++reportMsgId,
 				 "10658167303",
-				 "serviceid", "13651398480", new byte[]{},
+				 "serviceid", "13651398480", "a".getBytes(),
 				 "linkId");
 				 session.write(deliver);
 				// }

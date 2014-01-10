@@ -13,6 +13,7 @@ dependencies {
 }
 
 jar {
+	baseName = 'cmpp'
     manifest.attributes provider: 'www.ne81.com'
     version = '1.0'
 }

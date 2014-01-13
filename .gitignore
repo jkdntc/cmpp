@@ -6,4 +6,6 @@
 /.settings
 /.project
 /.classpath
-/.cmpp.iml
+/cmpp.iml
+/.idea
+/cmpp2smg/log

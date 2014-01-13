@@ -1,14 +1,5 @@
 package org.ne81.sp.cmpp;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Properties;
-import java.util.Vector;
-
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.session.IdleStatus;
@@ -18,6 +9,15 @@ import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Properties;
+import java.util.Vector;
 
 public class CmppClient implements Runnable, CmppListener {
 	private final Logger logger = LoggerFactory.getLogger(CmppClient.class);
@@ -75,7 +75,7 @@ public class CmppClient implements Runnable, CmppListener {
 	public void stop() {
 		thisThread = null;
 		// wait until the summation is done
-		session.getCloseFuture().awaitUninterruptibly(10 * 1000);
+		session.getCloseFuture().awaitUninterruptibly(3 * 1000);
 		session.close(false);
 		connector.dispose();
 	}

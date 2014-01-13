@@ -1,13 +1,13 @@
 package org.ne81.sp.cmpp;
 
+import org.ne81.commons.db.SqlPool;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
-
-import org.ne81.commons.db.SqlPool;
 
 public class Cmpp2Dao {
 	public final static int READY = 1;
@@ -73,15 +73,15 @@ public class Cmpp2Dao {
 				sql_error = pstmt.toString();
 				count = pstmt.executeUpdate();
 				pstmt.close();
-				sql = "INSERT INTO `cmpp_submit_destid`(`submitid`, `destTerminalId`)VALUES";
+				String subSql = "INSERT INTO `cmpp_submit_destid`(`submitid`, `destTerminalId`)VALUES";
 				for (int i = 0; i < messages.size(); i++) {
 					String destTerminalIds[] = messages.get(i).getDestTerminalId();
 					for (int j = 0; j < destTerminalIds.length; j++) {
-						sql += "('" + messages.get(i).getId() + "','" + destTerminalIds[j] + "'),";
+                        subSql += "('" + messages.get(i).getId() + "','" + destTerminalIds[j] + "'),";
 					}
 				}
-				sql = sql.substring(0, sql.length() - 1);
-				pstmt = conn.prepareStatement(sql);
+                subSql = subSql.substring(0, subSql.length() - 1);
+				pstmt = conn.prepareStatement(subSql);
 				sql_error = pstmt.toString();
 				count = pstmt.executeUpdate();
 				pstmt.close();
@@ -110,6 +110,7 @@ public class Cmpp2Dao {
 		sql = sql.substring(0, sql.length() - 1);
 		int count = 0;
 		Connection conn = null;
+        String pSql="";
 		for (int times = 0; times < 3; times++)
 			try {
 				conn = sqlPool.getConnection();
@@ -133,12 +134,12 @@ public class Cmpp2Dao {
 							message.getMsgContent(), message.getMsgFmt()));
 					pstmt.setString(i * colums + j++, message.getLinkId());
 				}
-				sql = pstmt.toString();
+                pSql = pstmt.toString();
 				count = pstmt.executeUpdate();
 				pstmt.close();
 				break;
 			} catch (SQLException e) {
-				sqlPool.saveSql(e.getMessage(), sql);
+				sqlPool.saveSql(e.getMessage(), pSql);
 				e.printStackTrace();
 			} finally {
 				if (conn != null)
@@ -161,6 +162,7 @@ public class Cmpp2Dao {
 		sql = sql.substring(0, sql.length() - 1);
 		int count = 0;
 		Connection conn = null;
+        String pSql="";
 		for (int times = 0; times < 3; times++)
 			try {
 				conn = sqlPool.getConnection();
@@ -177,12 +179,12 @@ public class Cmpp2Dao {
 					pstmt.setString(i * colums + j++, message.getDestTerminalId());
 					pstmt.setInt(i * colums + j++, message.getSmscSequence());
 				}
-				sql = pstmt.toString();
+                pSql = pstmt.toString();
 				count = pstmt.executeUpdate();
 				pstmt.close();
 				break;
 			} catch (SQLException e) {
-				sqlPool.saveSql(e.getMessage(), sql);
+				sqlPool.saveSql(e.getMessage(), pSql);
 				e.printStackTrace();
 			} finally {
 				if (conn != null)

@@ -1,6 +1,17 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin:'application'
+
+sourceCompatibility = 1.6
+compileJava.options.encoding = 'UTF-8'
+mainClassName = "org.ne81.sp.cmpp.test.CmppTestClient"
+
+jar {
+    baseName = 'cmpp'
+    manifest.attributes provider: 'www.ne81.com'
+    version = '1.0'
+}
 
 repositories {
    mavenCentral()
@@ -10,12 +21,5 @@ dependencies {
     compile('org.slf4j:slf4j-api:1.7.5')
     compile project(':ne81commons')
 	compile('org.apache.mina:mina-core:2.0.7')
+    compile 'ch.qos.logback:logback-classic:1.0.13'
 }
-
-jar {
-	baseName = 'cmpp'
-    manifest.attributes provider: 'www.ne81.com'
-    version = '1.0'
-}
-compileJava.options.encoding = 'UTF-8'
-

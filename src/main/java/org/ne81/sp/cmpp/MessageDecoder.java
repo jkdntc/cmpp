@@ -71,7 +71,7 @@ public class MessageDecoder {
 		deliver.setSrcTerminalId(field[i++]);
 		deliver.setSrcTerminalType(Byte.parseByte(field[i++]));
 		deliver.setRegisteredDelivery(Byte.parseByte(field[i++]));
-		deliver.setMsgLength(Byte.parseByte(field[i++]));
+		deliver.setMsgLength((byte) Integer.parseInt(field[i++]));
 		deliver.setMsgContent(CmppUtil.getMessageContentBytes(field[i++], deliver.getMsgFmt()));
 		deliver.setLinkId(field[i++]);
 		return deliver;

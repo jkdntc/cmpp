@@ -1,11 +1,10 @@
-/dist
 /bin
 /cmpp_log
-/log4j.log
 /build
 /.settings
 /.project
 /.classpath
-/cmpp.iml
+/*.iml
 /.idea
 /cmpp2smg/log
+/.gradle

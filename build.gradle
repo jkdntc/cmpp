@@ -5,21 +5,23 @@ apply plugin:'application'
 
 sourceCompatibility = 1.6
 compileJava.options.encoding = 'UTF-8'
-mainClassName = "org.ne81.sp.cmpp.test.CmppTestClient"
+mainClassName = "org.ne81.sp.cmpp.CmppService"
 
 jar {
     baseName = 'cmpp'
     manifest.attributes provider: 'www.ne81.com'
     version = '1.0'
 }
-
+processResources {
+    exclude "*.*"
+}
 repositories {
    mavenCentral()
 }
 
 dependencies {
     compile('org.slf4j:slf4j-api:1.7.5')
-    compile project(':ne81commons')
+    compile files('libs/ne81commons-1.0.jar')
 	compile('org.apache.mina:mina-core:2.0.7')
-    compile 'ch.qos.logback:logback-classic:1.0.13'
+    compile 'ch.qos.logback:logback-classic:1.1.2'
 }

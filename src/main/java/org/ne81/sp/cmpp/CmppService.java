@@ -13,7 +13,7 @@ public class CmppService {
 
     public CmppService(String moConf, String mtConf, String serviceClass)
             throws Exception {
-        System.out.println("1:"+moConf+"2:"+mtConf+"3:"+serviceClass);
+        System.out.println("1:" + moConf + "2:" + mtConf + "3:" + serviceClass);
         moClient = new CmppClient(moConf);
         CmppLogToDbListener toDb = new CmppLogToDbListener(moConf); //已保存文本日志
         moClient.addListener(toDb);
@@ -25,7 +25,7 @@ public class CmppService {
             mtClient.addListener(proxy);
         }
         service = (CmppListener) Class.forName(serviceClass).newInstance();
-        stg = new SenderThreadGroup<Object>(30, new CmppSenderThread(mtClient==null?moClient:mtClient, service));
+        stg = new SenderThreadGroup<Object>(30, new CmppSenderThread(mtClient == null ? moClient : mtClient, service));
     }
 
     public static void main(String[] args) throws Throwable {
@@ -77,6 +77,10 @@ public class CmppService {
         public void process(Object obj) {
             if (obj instanceof CmppDeliver) {
                 service.deliverReceived(client, (CmppDeliver) obj);
+            } else if (obj instanceof CmppReport) {
+                service.reportReceived(client, (CmppReport) obj);
+            } else if (obj instanceof CmppSubmit) {
+                service.submitSent(client, (CmppSubmit) obj);
             }
         }
 

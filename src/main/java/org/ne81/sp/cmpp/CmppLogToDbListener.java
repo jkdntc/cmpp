@@ -55,7 +55,6 @@ public class CmppLogToDbListener implements CmppListener {
 		} catch (IOException e) {
 			// TODO 报警
 			logger.error("IOException={}", e.getMessage());
-			e.printStackTrace();
 		}
 	}
 
@@ -67,7 +66,6 @@ public class CmppLogToDbListener implements CmppListener {
 		} catch (IOException e) {
 			// TODO 报警
 			logger.error("IOException={}", e.getMessage());
-			e.printStackTrace();
 		}
 	}
 
@@ -79,7 +77,6 @@ public class CmppLogToDbListener implements CmppListener {
 		} catch (IOException e) {
 			// TODO 报警
 			logger.error("IOException={}", e.getMessage());
-			e.printStackTrace();
 		}
 	}
 
@@ -107,7 +104,6 @@ public class CmppLogToDbListener implements CmppListener {
 					}
 				} catch (Exception ex) {
 					logger.error("Exception={}", ex.getMessage());
-					ex.printStackTrace();
 				}
 			}
 			if (list.size() > 0) {

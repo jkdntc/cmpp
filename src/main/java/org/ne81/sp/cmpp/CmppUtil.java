@@ -57,7 +57,7 @@ public class CmppUtil {
 	public static byte[] getMessageContentBytes(String msgContent, byte msgFmt) {
 		if (msgFmt == (byte) 8) {
 			try {
-				return msgContent.getBytes("utf-16");
+				return msgContent.getBytes("UnicodeBigUnmarked");
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
@@ -83,7 +83,7 @@ public class CmppUtil {
 		if (msgFmt == (byte) 8) {
 			try {
 				msgContent = new String(msgContentBytes, offset, msgContentBytes.length - offset,
-						"utf-16");
+						"UnicodeBigUnmarked");
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
@@ -117,7 +117,7 @@ public class CmppUtil {
 		if (shortMessage.length() <= 70) {
 			try {
 				if (submit.getMsgFmt() == (byte) 8)
-					submit.setMsgContent(shortMessage.getBytes("utf-16"));
+					submit.setMsgContent(shortMessage.getBytes("UnicodeBigUnmarked"));
 
 				else
 					submit.setMsgContent(shortMessage.getBytes("gbk"));
@@ -128,7 +128,7 @@ public class CmppUtil {
 			return new CmppSubmit[] { submit };
 		}
 
-		String splittedMsg[] = splitString(shortMessage, 66);
+		String splittedMsg[] = splitString(shortMessage, 67);
 		int totalSegments = splittedMsg.length;
 
 		submit.setTp_udhi((byte) 0x01);
@@ -139,7 +139,7 @@ public class CmppUtil {
 			byte[] msg = null;
 			try {
 				if (submit.getMsgFmt() == (byte) 8)
-					msg = splittedMsg[i].getBytes("utf-16");
+					msg = splittedMsg[i].getBytes("UnicodeBigUnmarked");
 				else
 					msg = splittedMsg[i].getBytes("gbk");
 			} catch (UnsupportedEncodingException e1) {
@@ -147,16 +147,15 @@ public class CmppUtil {
 				e1.printStackTrace();
 			}
 
-			ByteBuffer ed = ByteBuffer.allocate(7 + msg.length);
+			ByteBuffer ed = ByteBuffer.allocate(6 + msg.length);
 
-			ed.put((byte) 6); // UDH Length
+			ed.put((byte) 5); // UDH Length
 
-			ed.put((byte) 0x08); // IE Identifier
+			ed.put((byte) 0); // IE Identifier
 
-			ed.put((byte) 4); // IE Data Length
+			ed.put((byte) 3); // IE Data Length
 
 			ed.put((byte) 0); // Reference Number
-			ed.put((byte) 1); // Reference Number
 			ed.put((byte) totalSegments); // Number of pieces
 
 			ed.put((byte) (i + 1)); // Sequence number
@@ -190,7 +189,7 @@ public class CmppUtil {
 	 * <li>From the {@link Class#getClassLoader() callingClass.getClassLoader()
 	 * * }
 	 * </ul>
-	 * 
+	 *
 	 * @param resourceName
 	 *            The name of the resource to load
 	 * @param callingClass

@@ -118,13 +118,11 @@ public class CmppUtil {
 			try {
 				if (submit.getMsgFmt() == (byte) 8)
 					submit.setMsgContent(shortMessage.getBytes("UnicodeBigUnmarked"));
-
 				else
 					submit.setMsgContent(shortMessage.getBytes("gbk"));
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();// 应该不会报错
 			}
-			submit.setMsgContent(shortMessage.getBytes());
 			return new CmppSubmit[] { submit };
 		}
 
